@@ -33,14 +33,14 @@ var Form = React.createClass({
     onSubmit: React.PropTypes.func
   },
 
-  getDefaultProps() {
+  getDefaultProps: function() {
     return {
       component: 'form',
       method: 'GET'
     }
   },
 
-  handleSubmit(event) {
+  handleSubmit: function(event) {
     var formData = getFormData(event.target)
     var allowTransition = true
     var submitResult
@@ -56,7 +56,7 @@ var Form = React.createClass({
     event.preventDefault()
 
     if (allowTransition) {
-      if (this.props.method.toUpperCase() === 'GET') {
+      if (this.props.method === 'GET') {
         // GET submissions use the query string, so just marge form data into it
         this.context.router.transitionTo(
           this.props.to,
@@ -65,12 +65,11 @@ var Form = React.createClass({
         )
       }
       else {
-        // For other methods, pass the method and form body as transition data
+        // HACK - add data to the query string along with a dummy method indicator
         this.context.router.transitionTo(
           this.props.to,
           this.props.params,
-          this.props.query,
-          {body: formData, method: this.props.method}
+          assign({}, this.props.query, formData, {_method: this.props.method})
         )
       }
     }
@@ -79,11 +78,11 @@ var Form = React.createClass({
   /**
    * Returns the value of the "action" attribute to use on the DOM element.
    */
-  getAction() {
+  getAction: function() {
     return this.context.router.makeHref(this.props.to, this.props.params, this.props.query)
   },
 
-  render() {
+  render: function() {
     var props = assign({}, this.props, {
       action: this.getAction(),
       onSubmit: this.handleSubmit
